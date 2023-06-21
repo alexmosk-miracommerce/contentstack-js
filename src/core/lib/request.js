@@ -41,6 +41,10 @@ export default function Request(stack, fetchOptions) {
             queryParams = serialize(requestParams.body);
         }
 
+        if (fetchOptions.fetcher) {
+            console.log("Custom fetcher is being passed.");
+        }
+
         return fetchRetry(stack, queryParams, 
                             fetchOptions, 
                             resolve, 
