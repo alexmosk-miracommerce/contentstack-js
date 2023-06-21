@@ -44,7 +44,8 @@ export default function Request(stack, fetchOptions) {
         return fetchRetry(stack, queryParams, 
                             fetchOptions, 
                             resolve, 
-                            reject, 
+                            reject,
+                            fetchOptions.fetcher,
                             fetchOptions.retryDelay, 
                             fetchOptions.retryLimit)
         
@@ -57,7 +58,7 @@ function wait(retryDelay) {
     });
 }
 
-function fetchRetry(stack, queryParams, fetchOptions, resolve, reject, retryDelay = 300, retryLimit = 5) {
+function fetchRetry(stack, queryParams, fetchOptions, resolve, reject, fetcher = fetch, retryDelay = 300, retryLimit = 5) {
     const requestParams = stack.requestParams,
         url = requestParams.url + '?' + queryParams,
         headers = requestParams.headers
@@ -109,7 +110,7 @@ function fetchRetry(stack, queryParams, fetchOptions, resolve, reject, retryDela
     }
 
     
-    fetch(request.url, request.option)
+    fetcher(request.url, request.option)
         .then( function(response) {
             
             if (fetchOptions.debug)  fetchOptions.logHandler('info', response);
