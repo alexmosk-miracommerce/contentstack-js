@@ -41,15 +41,14 @@ export default function Request(stack, fetchOptions) {
             queryParams = serialize(requestParams.body);
         }
 
-        if (fetchOptions.fetcher) {
-            console.log("Custom fetcher is being passed.");
+        if (fetchOptions.fetch) {
+            console.log("Customfetcher is being passed.");
         }
 
         return fetchRetry(stack, queryParams, 
                             fetchOptions, 
                             resolve, 
                             reject,
-                            fetchOptions.fetcher,
                             fetchOptions.retryDelay, 
                             fetchOptions.retryLimit)
         
@@ -62,7 +61,7 @@ function wait(retryDelay) {
     });
 }
 
-function fetchRetry(stack, queryParams, fetchOptions, resolve, reject, fetcher = fetch, retryDelay = 300, retryLimit = 5) {
+function fetchRetry(stack, queryParams, fetchOptions, resolve, reject, retryDelay = 300, retryLimit = 5) {
     const requestParams = stack.requestParams,
         url = requestParams.url + '?' + queryParams,
         headers = requestParams.headers
@@ -72,6 +71,7 @@ function fetchRetry(stack, queryParams, fetchOptions, resolve, reject, fetcher =
         timeout: 30000,                                
     }, 
     fetchOptions);
+    const customFetcher = fetchOptions.fetch || fetch;
 
     function onError (error) {
         if (retryLimit === 0) {
@@ -114,7 +114,7 @@ function fetchRetry(stack, queryParams, fetchOptions, resolve, reject, fetcher =
     }
 
     
-    fetcher(request.url, request.option)
+    customFetcher(request.url, request.option)
         .then( function(response) {
             
             if (fetchOptions.debug)  fetchOptions.logHandler('info', response);
